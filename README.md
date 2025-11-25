@@ -10,7 +10,7 @@ A beautiful, responsive Rock Paper Scissors game built with vanilla HTML, CSS, a
 - Mobile-friendly
 
 ## 🚀 Live Demo
-[Play the game here!](https://lolo1234s.github.io/rock-paper-scissors-game)
+[Play the game here!](https://lolo1234s.github.io/Rock-Paper-Scissors/)
 
 ## 🛠️ Technologies
 - HTML5
