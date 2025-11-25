@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rock Paper Scissors</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Barlow Semi Condensed", sans-serif;
+        background: radial-gradient(
+          circle at top,
+          hsl(214, 47%, 23%),
+          hsl(237, 48%, 15%)
+        );
+        min-height: 100vh;
+        color: white;
+        padding: 30px;
+      }
+
+      .container {
+        max-width: 700px;
+        margin: 0 auto;
+      }
+
+      /* Header Styles */
+      .header {
+        border: 3px solid hsl(246, 11%, 37%);
+        border-radius: 15px;
+        padding: 18px 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 80px;
+      }
+
+      .logo {
+        font-size: 2.5rem;
+        font-weight: 700;
+        line-height: 0.8;
+        text-transform: uppercase;
+      }
+
+      .score-box {
+        background: white;
+        border-radius: 8px;
+        padding: 16px 40px;
+        text-align: center;
+      }
+
+      .score-label {
+        color: hsl(229, 64%, 46%);
+        font-size: 1rem;
+        font-weight: 600;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+      }
+
+      .score-value {
+        color: hsl(229, 25%, 31%);
+        font-size: 3.5rem;
+        font-weight: 700;
+        line-height: 1;
+      }
+
+      /* Game Board Styles */
+      .game-board {
+        position: relative;
+        width: 476px;
+        height: 430px;
+        margin: 0 auto;
+      }
+
+      .triangle-bg {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 300px;
+        height: 280px;
+        background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="305" height="277"><path fill="none" stroke="%23fff" stroke-width="15" d="M291.5 7.5h-276l138 240z" opacity=".2"/></svg>');
+        background-repeat: no-repeat;
+        background-position: center;
+      }
+
+      .choice-btn {
+        position: absolute;
+        width: 150px;
+        height: 150px;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .choice-btn:hover {
+        transform: scale(1.05);
+      }
+
+      .choice-btn::before {
+        content: "";
+        position: absolute;
+        width: 110px;
+        height: 110px;
+        background: white;
+        border-radius: 50%;
+        box-shadow: inset 0 8px 0 rgba(0, 0, 0, 0.1);
+      }
+
+      .choice-icon {
+        position: relative;
+        z-index: 1;
+        width: 50px;
+        height: 50px;
+      }
+
+      .rock {
+        bottom: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(
+          to bottom,
+          hsl(39, 89%, 49%),
+          hsl(28, 76%, 44%)
+        );
+        box-shadow: 0 8px 0 hsl(28, 76%, 44%);
+      }
+
+      .paper {
+        top: -30px;
+        left: -30px;
+        background: linear-gradient(
+          to bottom,
+          hsl(230, 89%, 62%),
+          hsl(229, 64%, 46%)
+        );
+        box-shadow: 0 8px 0 hsl(229, 64%, 46%);
+      }
+
+      .scissors {
+        top: -30px;
+        right: -30px;
+        background: linear-gradient(
+          to bottom,
+          hsl(349, 71%, 52%),
+          hsl(347, 75%, 35%)
+        );
+        box-shadow: 0 8px 0 hsl(347, 75%, 35%);
+      }
+
+      /* Results Screen */
+      .results-screen {
+        display: none;
+        grid-template-columns: 1fr auto 1fr;
+        gap: 60px;
+        align-items: center;
+        margin-top: 40px;
+      }
+
+      .player-pick,
+      .house-pick {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 40px;
+      }
+
+      .pick-label {
+        font-size: 1.5rem;
+        font-weight: 600;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+      }
+
+      .pick-display {
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+      }
+
+      .pick-display::before {
+        content: "";
+        position: absolute;
+        width: 150px;
+        height: 150px;
+        background: white;
+        border-radius: 50%;
+        box-shadow: inset 0 8px 0 rgba(0, 0, 0, 0.1);
+      }
+
+      .pick-icon {
+        position: relative;
+        z-index: 1;
+        width: 60px;
+        height: 60px;
+      }
+
+      .result-message {
+        text-align: center;
+      }
+
+      .result-text {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+      }
+
+      .play-again-btn {
+        background: white;
+        color: hsl(229, 25%, 31%);
+        border: none;
+        border-radius: 8px;
+        padding: 16px 60px;
+        font-size: 1rem;
+        font-weight: 600;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .play-again-btn:hover {
+        color: hsl(349, 71%, 52%);
+      }
+
+      /* Rules Button */
+      .rules-btn {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background: transparent;
+        border: 2px solid hsl(246, 11%, 37%);
+        border-radius: 8px;
+        color: white;
+        padding: 12px 36px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .rules-btn:hover {
+        background: white;
+        color: hsl(229, 25%, 31%);
+      }
+
+      /* Rules Modal */
+      .rules-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+
+      .modal-content {
+        background: white;
+        border-radius: 15px;
+        padding: 40px;
+        max-width: 400px;
+        color: hsl(229, 25%, 31%);
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+      }
+
+      .modal-title {
+        font-size: 2rem;
+        font-weight: 700;
+      }
+
+      .close-btn {
+        background: none;
+        border: none;
+        font-size: 2rem;
+        color: hsl(246, 11%, 37%);
+        cursor: pointer;
+        padding: 0;
+        width: 30px;
+        height: 30px;
+      }
+
+      .rules-image {
+        width: 100%;
+        height: auto;
+      }
+
+      /* Footer */
+      .footer {
+        text-align: center;
+        margin-top: 60px;
+        color: hsl(246, 11%, 37%);
+        font-size: 0.9rem;
+      }
+
+      .footer a {
+        color: inherit;
+      }
+
+      /* Empty state for house pick */
+      .empty-circle {
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.1);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Header -->
+      <div class="header">
+        <div class="logo">Rock<br />Paper<br />Scissors</div>
+        <div class="score-box">
+          <div class="score-label">Score</div>
+          <div class="score-value" id="score">12</div>
+        </div>
+      </div>
+
+      <!-- Game Board -->
+      <div class="game-board" id="gameBoard">
+        <div class="triangle-bg"></div>
+        <button class="choice-btn paper" data-choice="paper">
+          <img
+            src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='49' height='59'%3E%3Cpath fill='%233B4262' d='M47.125 11.832a2.922 2.922 0 00-1.232-.198c-.57.04-1.029.271-1.302.65-1.604 2.248-2.919 6.493-3.979 9.905-.486 1.577-1.14 3.688-1.612 4.69-.493-2.807.064-13.09.28-17.05l.003-.064c.15-2.751.17-3.234.138-3.446-.238-1.509-.843-2.5-1.799-2.943-.966-.45-2.22-.25-3.572.563-.677.41-.865 1.816-1.446 8.19l-.002.028c-.32 3.502-1.058 11.566-1.965 12.91-1.023-1.88-2.431-12.555-3.039-17.176-.425-3.236-.673-5.094-.84-5.655-.35-1.176-1.83-2.176-3.295-2.232-1.22-.06-2.22.56-2.698 1.638-.894.995-.578 4.292.41 12.102.47 3.718 1.44 11.395.83 12.257-1.219-.133-3.31-4.942-6.215-14.299-.816-2.62-1.068-3.408-1.318-3.753-.494-1.202-2.172-2.129-3.676-2.024a3.183 3.183 0 00-.377.049c-.787.156-2.584.881-2.2 4.226 1.06 4.637 2.213 8.041 3.331 11.346l.023.066c.669 1.98 1.302 3.85 1.89 5.925 1.385 4.9.846 7.94.84 7.975-.046.312-.143.503-.288.57a.556.556 0 01-.195.045c-.44.03-1.098-.26-1.437-.45-.776-1.482-4.636-8.544-8.134-9.524l-.126-.037-.127.012c-1.283.121-2.226.606-2.803 1.441-.914 1.32-.535 3.002-.444 3.34l.052.12c.028.051 2.834 5.165 3.268 7.544.374 2.04 2.311 4.25 3.869 6.026l.064.073c.508.58.946 1.083 1.292 1.548 4.519 4.713 11.665 8.677 11.723 8.71.892.657 1.387 1.293 1.44 1.84a.798.798 0 01-.16.58l-.155.162.988.96 18.853-1.324.804-3.684c2.486-10.402 1.967-19.272 1.958-19.33.01-.327.706-3.483 1.266-6.033l.017-.065c1.117-5.08 2.505-11.4 2.772-13.803.116-1.028-.542-1.972-1.675-2.401z'/%3E%3C/svg%3E"
+            alt="Paper"
+            class="choice-icon"
+          />
+        </button>
+        <button class="choice-btn scissors" data-choice="scissors">
+          <img
+            src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='51' height='58'%3E%3Cpath fill='%233B4262' d='M13.971 25.702l6.012-8.415c-2.499-.415-7.088-.507-10.846 3.235C3.212 26.421.812 39.163.312 42.248L15.37 57.24c2.711-.232 14.713-1.827 26.279-13.34.122-.249 2.94-2.321.636-4.614-1.1-1.095-2.919-1.074-4.042.044-.572.57-1.461.577-2.021.02-.56-.557-.552-1.443.02-2.012l4.087-4.069c2.076-2.067.119-5.555-2.78-4.717l-3.345 2.851c-.611.53-1.52.439-2.022-.14-.519-.597-.408-1.503.183-2.013 11.687-10.208 9.98-8.979 17.5-15.995 2.809-2.329-.725-6.447-3.493-4.09L28.182 25.45c-.529.448-1.34.457-1.86-.02-.601-.517-.615-1.262-.222-1.85L38.787 3.944c1.854-2.5-1.795-5.277-3.749-2.757L16.28 27.307c-.452.65-1.364.8-1.985.345a1.377 1.377 0 01-.323-1.95z'/%3E%3C/svg%3E"
+            alt="Scissors"
+            class="choice-icon"
+          />
+        </button>
+        <button class="choice-btn rock" data-choice="rock">
+          <img
+            src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Cpath fill='%233B4262' d='M45.06 12.22c-.642-8.096-9.734-7.269-9.734-7.269-3.837-6.765-9.832-1.865-9.832-1.865-4.606-6.63-10.38-.486-10.38-.486-9.957-1.074-9.571 7.066-9.571 7.066-.234 2.588 1.403 10.593 1.403 10.593-1.477-4.614-4.68-.784-4.68-.784-3.94 6.078-.975 9.405-.975 9.405 5.33 6.246 16.688 13.743 16.688 13.743 4.113 2.356 2.373 4.457 2.373 4.457l24.876-4.11.571-4.718c3.782-11.436-.739-26.032-.739-26.032z'/%3E%3C/svg%3E"
+            alt="Rock"
+            class="choice-icon"
+          />
+        </button>
+      </div>
+
+      <!-- Results Screen -->
+      <div class="results-screen" id="resultsScreen">
+        <div class="player-pick">
+          <div class="pick-label">You Picked</div>
+          <div class="pick-display" id="playerPickDisplay">
+            <!-- Player's choice will be displayed here -->
+          </div>
+        </div>
+
+        <div class="result-message">
+          <div class="result-text" id="resultText">You Win</div>
+          <button class="play-again-btn" id="playAgainBtn">Play Again</button>
+        </div>
+
+        <div class="house-pick">
+          <div class="pick-label">The House Picked</div>
+          <div class="pick-display" id="housePickDisplay">
+            <div class="empty-circle"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rules Button -->
+      <button class="rules-btn" id="rulesBtn">Rules</button>
+
+      <!-- Rules Modal -->
+      <div class="rules-modal" id="rulesModal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2 class="modal-title">Rules</h2>
+            <button class="close-btn" id="closeModalBtn">&times;</button>
+          </div>
+          <img src="./images/image-rules.svg" class="rules-image" />
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="footer">
+        Challenge by
+        <a href="https://www.frontendmentor.io?ref=challenge" target="_blank"
+          >Frontend Mentor</a
+        >. Coded by <a href="#">Your Name Here</a>.
+      </div>
+    </div>
+
+    <script>
+      // Game state
+      let score = parseInt(localStorage.getItem("rpsScore")) || 12;
+      const choices = ["rock", "paper", "scissors"];
+      const winningConditions = {
+        rock: "scissors",
+        paper: "rock",
+        scissors: "paper",
+      };
+
+      // DOM elements
+      const scoreElement = document.getElementById("score");
+      const gameBoard = document.getElementById("gameBoard");
+      const resultsScreen = document.getElementById("resultsScreen");
+      const playerPickDisplay = document.getElementById("playerPickDisplay");
+      const housePickDisplay = document.getElementById("housePickDisplay");
+      const resultText = document.getElementById("resultText");
+      const playAgainBtn = document.getElementById("playAgainBtn");
+      const rulesBtn = document.getElementById("rulesBtn");
+      const rulesModal = document.getElementById("rulesModal");
+      const closeModalBtn = document.getElementById("closeModalBtn");
+      const choiceButtons = document.querySelectorAll(".choice-btn");
+
+      // Initialize score
+      scoreElement.textContent = score;
+
+      // Game functions
+      function getHouseChoice() {
+        const randomIndex = Math.floor(Math.random() * choices.length);
+        return choices[randomIndex];
+      }
+
+      function determineWinner(playerChoice, houseChoice) {
+        if (playerChoice === houseChoice) {
+          return "draw";
+        }
+        return winningConditions[playerChoice] === houseChoice ? "win" : "lose";
+      }
+
+      function updateScore(result) {
+        if (result === "win") {
+          score++;
+        } else if (result === "lose") {
+          score--;
+        }
+        scoreElement.textContent = score;
+        localStorage.setItem("rpsScore", score);
+      }
+
+      function displayChoice(choice, displayElement) {
+        const colors = {
+          rock: "linear-gradient(to bottom, hsl(39, 89%, 49%), hsl(28, 76%, 44%))",
+          paper:
+            "linear-gradient(to bottom, hsl(230, 89%, 62%), hsl(229, 64%, 46%))",
+          scissors:
+            "linear-gradient(to bottom, hsl(349, 71%, 52%), hsl(347, 75%, 35%))",
+        };
+
+        const icons = {
+          rock: "<img src=\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Cpath fill='%233B4262' d='M45.06 12.22c-.642-8.096-9.734-7.269-9.734-7.269-3.837-6.765-9.832-1.865-9.832-1.865-4.606-6.63-10.38-.486-10.38-.486-9.957-1.074-9.571 7.066-9.571 7.066-.234 2.588 1.403 10.593 1.403 10.593-1.477-4.614-4.68-.784-4.68-.784-3.94 6.078-.975 9.405-.975 9.405 5.33 6.246 16.688 13.743 16.688 13.743 4.113 2.356 2.373 4.457 2.373 4.457l24.876-4.11.571-4.718c3.782-11.436-.739-26.032-.739-26.032z'/%3E%3C/svg%3E\" alt=\"Rock\" class=\"pick-icon\">",
+          paper:
+            "<img src=\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='49' height='59'%3E%3Cpath fill='%233B4262' d='M47.125 11.832a2.922 2.922 0 00-1.232-.198c-.57.04-1.029.271-1.302.65-1.604 2.248-2.919 6.493-3.979 9.905-.486 1.577-1.14 3.688-1.612 4.69-.493-2.807.064-13.09.28-17.05l.003-.064c.15-2.751.17-3.234.138-3.446-.238-1.509-.843-2.5-1.799-2.943-.966-.45-2.22-.25-3.572.563-.677.41-.865 1.816-1.446 8.19l-.002.028c-.32 3.502-1.058 11.566-1.965 12.91-1.023-1.88-2.431-12.555-3.039-17.176-.425-3.236-.673-5.094-.84-5.655-.35-1.176-1.83-2.176-3.295-2.232-1.22-.06-2.22.56-2.698 1.638-.894.995-.578 4.292.41 12.102.47 3.718 1.44 11.395.83 12.257-1.219-.133-3.31-4.942-6.215-14.299-.816-2.62-1.068-3.408-1.318-3.753-.494-1.202-2.172-2.129-3.676-2.024a3.183 3.183 0 00-.377.049c-.787.156-2.584.881-2.2 4.226 1.06 4.637 2.213 8.041 3.331 11.346l.023.066c.669 1.98 1.302 3.85 1.89 5.925 1.385 4.9.846 7.94.84 7.975-.046.312-.143.503-.288.57a.556.556 0 01-.195.045c-.44.03-1.098-.26-1.437-.45-.776-1.482-4.636-8.544-8.134-9.524l-.126-.037-.127.012c-1.283.121-2.226.606-2.803 1.441-.914 1.32-.535 3.002-.444 3.34l.052.12c.028.051 2.834 5.165 3.268 7.544.374 2.04 2.311 4.25 3.869 6.026l.064.073c.508.58.946 1.083 1.292 1.548 4.519 4.713 11.665 8.677 11.723 8.71.892.657 1.387 1.293 1.44 1.84a.798.798 0 01-.16.58l-.155.162.988.96 18.853-1.324.804-3.684c2.486-10.402 1.967-19.272 1.958-19.33.01-.327.706-3.483 1.266-6.033l.017-.065c1.117-5.08 2.505-11.4 2.772-13.803.116-1.028-.542-1.972-1.675-2.401z'/%3E%3C/svg%3E\" alt=\"Paper\" class=\"pick-icon\">",
+          scissors:
+            "<img src=\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='51' height='58'%3E%3Cpath fill='%233B4262' d='M13.971 25.702l6.012-8.415c-2.499-.415-7.088-.507-10.846 3.235C3.212 26.421.812 39.163.312 42.248L15.37 57.24c2.711-.232 14.713-1.827 26.279-13.34.122-.249 2.94-2.321.636-4.614-1.1-1.095-2.919-1.074-4.042.044-.572.57-1.461.577-2.021.02-.56-.557-.552-1.443.02-2.012l4.087-4.069c2.076-2.067.119-5.555-2.78-4.717l-3.345 2.851c-.611.53-1.52.439-2.022-.14-.519-.597-.408-1.503.183-2.013 11.687-10.208 9.98-8.979 17.5-15.995 2.809-2.329-.725-6.447-3.493-4.09L28.182 25.45c-.529.448-1.34.457-1.86-.02-.601-.517-.615-1.262-.222-1.85L38.787 3.944c1.854-2.5-1.795-5.277-3.749-2.757L16.28 27.307c-.452.65-1.364.8-1.985.345a1.377 1.377 0 01-.323-1.95z'/%3E%3C/svg%3E\" alt=\"Scissors\" class=\"pick-icon\">",
+        };
+
+        displayElement.style.background = colors[choice];
+        displayElement.style.boxShadow = `0 8px 0 ${
+          colors[choice].includes("49%)")
+            ? "hsl(28, 76%, 44%)"
+            : colors[choice].includes("62%)")
+            ? "hsl(229, 64%, 46%)"
+            : "hsl(347, 75%, 35%)"
+        }`;
+        displayElement.innerHTML = icons[choice];
+      }
+
+      function playGame(playerChoice) {
+        const houseChoice = getHouseChoice();
+        const result = determineWinner(playerChoice, houseChoice);
+
+        // Hide game board, show results
+        gameBoard.style.display = "none";
+        resultsScreen.style.display = "grid";
+
+        // Display player choice immediately
+        displayChoice(playerChoice, playerPickDisplay);
+
+        // Clear house display and show empty circle
+        housePickDisplay.innerHTML = '<div class="empty-circle"></div>';
+
+        // Add delay for house choice reveal
+        setTimeout(() => {
+          displayChoice(houseChoice, housePickDisplay);
+
+          // Show result after house choice is revealed
+          setTimeout(() => {
+            if (result === "win") {
+              resultText.textContent = "You Win";
+              resultText.style.color = "hsl(39, 89%, 49%)";
+            } else if (result === "lose") {
+              resultText.textContent = "You Lose";
+              resultText.style.color = "hsl(349, 71%, 52%)";
+            } else {
+              resultText.textContent = "Draw";
+              resultText.style.color = "white";
+            }
+
+            updateScore(result);
+          }, 500);
+        }, 1000);
+      }
+
+      function resetGame() {
+        gameBoard.style.display = "block";
+        resultsScreen.style.display = "none";
+        playerPickDisplay.innerHTML = "";
+        housePickDisplay.innerHTML = '<div class="empty-circle"></div>';
+        resultText.style.color = "white";
+      }
+
+      // Event listeners
+      choiceButtons.forEach((button) => {
+        button.addEventListener("click", (e) => {
+          const choice = e.currentTarget.getAttribute("data-choice");
+          playGame(choice);
+        });
+      });
+
+      playAgainBtn.addEventListener("click", resetGame);
+
+      rulesBtn.addEventListener("click", () => {
+        rulesModal.style.display = "flex";
+      });
+
+      closeModalBtn.addEventListener("click", () => {
+        rulesModal.style.display = "none";
+      });
+
+      rulesModal.addEventListener("click", (e) => {
+        if (e.target === rulesModal) {
+          rulesModal.style.display = "none";
+        }
+      });
+    </script>
+  </body>
+</html>
